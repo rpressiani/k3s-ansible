@@ -1,0 +1,6 @@
+---
+- name: Longhorn prereq
+  hosts: all
+  become: true
+  roles:
+    - role: longhorn

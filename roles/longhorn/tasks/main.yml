@@ -1,0 +1,48 @@
+---
+- name: Install open-iscsi
+  ansible.builtin.package:
+    name: open-iscsi
+    state: present
+
+- name: Install cryptsetup
+  ansible.builtin.package:
+    name: cryptsetup
+    state: present
+
+- name: Ensure dm_crypt module is loaded
+  community.general.modprobe:
+    name: dm_crypt
+    state: present
+
+- name: Enable and start iscsid service
+  ansible.builtin.systemd:
+    name: iscsid.service
+    enabled: true
+    state: started
+
+- name: Enable and start iscsid socket
+  ansible.builtin.systemd:
+    name: iscsid.socket
+    enabled: true
+    state: started
+  notify: Reboot
+
+- name: Ensure iscsi_tcp module is loaded
+  community.general.modprobe:
+    name: iscsi_tcp
+    state: present
+  notify: Reboot
+
+- name: Persist dm_crypt module after reboot # noqa risky-file-permissions
+  ansible.builtin.lineinfile:
+    path: /etc/modules-load.d/dm_crypt.conf
+    create: true
+    line: dm_crypt
+  notify: Reboot
+
+- name: Persist iscsi_tcp module after reboot # noqa risky-file-permissions
+  ansible.builtin.lineinfile:
+    path: /etc/modules-load.d/iscsi_tcp.conf
+    create: true
+    line: iscsi_tcp
+  notify: Reboot

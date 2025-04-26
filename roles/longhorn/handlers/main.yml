@@ -1,0 +1,5 @@
+---
+- name: Reboot
+  throttle: 1
+  ansible.builtin.reboot:
+    test_command: uptime
