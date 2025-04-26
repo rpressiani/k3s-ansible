@@ -57,6 +57,15 @@
         port: "2379:2381"
         proto: tcp
 
+    - name: If ufw enabled, open flannel VXLAN ports
+      when:
+        - "'Status: active' in ufw_status['stdout']"
+        - groups[server_group] | length > 1
+      community.general.ufw:
+        rule: allow
+        port: "8472"
+        proto: udp
+
     - name: If ufw enabled, allow default CIDRs
       when:
         - "'Status: active' in ufw_status['stdout']"
